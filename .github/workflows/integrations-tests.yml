@@ -1,0 +1,89 @@
+name: Integration Tests
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  schedule:
+   - cron: '0 9 * * *'
+  
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: ./
+        name: Prometheus (YAML)
+        id: prometheus
+        with:
+          product: 'prometheus'
+          file_path: '__fixtures__/helm-values.yaml'
+          file_key: 'image.tag'
+      - uses: ./
+        name: Grafana (JSON)
+        id: grafana
+        with:
+          product: 'grafana'
+          file_path: '__fixtures__/helm-values.json'
+          file_key: 'image.tag'
+          file_format: 'json'
+      - uses: ./
+        name: Graylog (Regex)
+        id: graylog
+        with:
+          product: 'graylog'
+          file_path: '__fixtures__/services.xml'
+          regex: 'v([0-9]+\.[0-9]+\.[0-9]+)'
+      - uses: ./
+        name: AKS (Regex)
+        id: aks
+        with:
+          product: 'azure-kubernetes-service'
+          file_path: '__fixtures__/variables.tf'
+          regex: '(?<=default = \")([^\"]+)'
+
+    outputs:
+      prometheus_end_of_life: "${{ steps.prometheus.outputs.end_of_life }}"
+      prometheus_version: "${{ steps.prometheus.outputs.version }}"
+      grafana_end_of_life: "${{ steps.grafana.outputs.end_of_life }}"
+      grafana_version: "${{ steps.grafana.outputs.version }}"
+      graylog_end_of_life: "${{ steps.graylog.outputs.end_of_life }}"
+      graylog_version: "${{ steps.graylog.outputs.version }}"
+
+  assert:
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - name: Assert Prometheus EoL
+        uses: nick-fields/assert-action@v1
+        with:
+          expected: 'true'
+          actual: "${{ needs.test.outputs.prometheus_end_of_life }}"
+      - name: Assert Prometheus extracted version
+        uses: nick-fields/assert-action@v1
+        with:
+          expected: 'v2.55.1'
+          actual: "${{ needs.test.outputs.prometheus_version }}"
+      - name: Assert Grafana EoL
+        uses: nick-fields/assert-action@v1
+        with:
+          expected: 'true'
+          actual: "${{ needs.test.outputs.grafana_end_of_life }}"
+      - name: Assert Grafana extracted version
+        uses: nick-fields/assert-action@v1
+        with:
+          expected: 'v10.3.12'
+          actual: "${{ needs.test.outputs.grafana_version }}"
+      - name: Assert Graylog EoL
+        uses: nick-fields/assert-action@v1
+        with:
+          expected: 'true'
+          actual: "${{ needs.test.outputs.graylog_end_of_life }}"
+      - name: Assert Graylog extracted version
+        uses: nick-fields/assert-action@v1
+        with:
+          expected: 'v5.2.12'
+          actual: "${{ needs.test.outputs.graylog_version }}"

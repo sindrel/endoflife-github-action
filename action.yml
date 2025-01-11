@@ -1,0 +1,76 @@
+name: 'End-of-Life GitHub Action'
+description: 'Identifies the End-of-life (EoL) dates for products, using the endoflife.date API.'
+author: Sindre Lindstad (https://github.com/sindrel)
+branding:
+  icon: 'check-circle'
+  color: 'blue'
+inputs:
+  product:
+    required: true
+    description: "The product id (see the URL on https://endoflife.date)."
+  file_path:
+    required: false
+    description: "Path to the file containing the version information."
+    default: ""
+  file_key:
+    required: false
+    description: "Key used to extract the version from the file if YAML or JSON (e.g. 'image.tag')."
+    default: ""
+  file_format:
+    required: false
+    description: "Format of the file containing the version information."
+    default: "yaml"
+  version:
+    required: false
+    description: "If not using a file, the version can be provided directly."
+    default: ""
+  regex:
+    required: false
+    description: "Regular expression to capture a group in any file."
+    default: ""
+  fail_on_eol:
+    required: false
+    description: "Whether to fail if the end-of-life date has passed."
+    default: "false"
+  fail_days_left:
+    required: false
+    description: "Fail the action if the end-of-life date is less than this number of days away."
+outputs:
+  end_of_life:
+    description: "Whether the end-of-life date has passed or not."
+    value: "${{ steps.get-cycle.outputs.end_of_life }}"
+  version:
+    description: "The version extracted from file (if not provided)."
+    value: "${{ steps.get-cycle.outputs.version }}"
+  days_until_eol:
+    description: "The number of days until the end-of-life date (negative if passed)."
+    value: "${{ steps.get-cycle.outputs.days_until_eol }}"
+  text_summary:
+    description: "A brief summary of the end-of-life status."
+    value: "${{ steps.get-cycle.outputs.text_summary }}"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    - name: Install dependencies
+      shell: "bash"
+      working-directory: ${{ github.action_path }}/src/
+      run: |
+        python -m pip install --upgrade pip && \
+        pip install -r requirements.txt
+    - id: get-cycle
+      name: Fetch cycle
+      shell: "bash"
+      working-directory: ./
+      run: |
+        python ${GITHUB_ACTION_PATH}/src/get_cycle.py \
+        --product '${{ inputs.product }}' \
+        --file_path '${{ inputs.file_path }}' \
+        --file_key '${{ inputs.file_key }}' \
+        --file_format '${{ inputs.file_format }}' \
+        --version '${{ inputs.version }}' \
+        --regex '${{ inputs.regex }}' \
+        --fail_on_eol '${{ inputs.fail_on_eol }}' \
+        --fail_days_left '${{ inputs.fail_days_left }}'
