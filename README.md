@@ -1,7 +1,7 @@
 <p align="center">
   <img src="assets/eol-action-logo.png" width="140px" height="140px" />
   <h2 align="center">End-of-Life GitHub Action</h2>
-  <p align="center">Source running versions of components from files in your repository. Get notified when they're no longer being maintained.</p>
+  <p align="center">Stay updated with your components — track versions in your repo and get notified when they're no longer maintained.</p>
 </p>
 
 ## Features
