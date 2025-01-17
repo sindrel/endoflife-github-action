@@ -7,7 +7,7 @@
 ## Features
 
 - Fetches product cycle information from the [endoflife.date API](https://endoflife.date).
-- Supports version extraction from YAML, JSON, or plain text files.
+- Supports version extraction from YAML, JSON, or any plain text file.
 - Allows for failure conditions based on end-of-life status and days until end-of-life.
 - Outputs can be used in subsequent steps, e.g. for pushing notifications or raising alerts.
 
@@ -139,7 +139,7 @@ Here’s an example of how to use it in a workflow (for JSON, set `file_format` 
 
 ## Extracting the version from any file using a regular expression
 
-It's possible to extract a version from any plaintext file using the `regex` input.
+It's possible to extract a version from any plain text file using the `regex` input.
 
 Let's say you have a XML document that contains a version you wish to extract:
 
