@@ -61,32 +61,32 @@ jobs:
     needs: [test]
     steps:
       - name: Assert Prometheus EoL
-        uses: nick-fields/assert-action@v1
+        uses: nick-fields/assert-action@v2
         with:
           expected: 'true'
           actual: "${{ needs.test.outputs.prometheus_end_of_life }}"
       - name: Assert Prometheus extracted version
-        uses: nick-fields/assert-action@v1
+        uses: nick-fields/assert-action@v2
         with:
           expected: 'v2.55.1'
           actual: "${{ needs.test.outputs.prometheus_version }}"
       - name: Assert Grafana EoL
-        uses: nick-fields/assert-action@v1
+        uses: nick-fields/assert-action@v2
         with:
           expected: 'true'
           actual: "${{ needs.test.outputs.grafana_end_of_life }}"
       - name: Assert Grafana extracted version
-        uses: nick-fields/assert-action@v1
+        uses: nick-fields/assert-action@v2
         with:
           expected: 'v10.3.12'
           actual: "${{ needs.test.outputs.grafana_version }}"
       - name: Assert Graylog EoL
-        uses: nick-fields/assert-action@v1
+        uses: nick-fields/assert-action@v2
         with:
           expected: 'true'
           actual: "${{ needs.test.outputs.graylog_end_of_life }}"
       - name: Assert Graylog extracted version
-        uses: nick-fields/assert-action@v1
+        uses: nick-fields/assert-action@v2
         with:
           expected: 'v5.2.12'
           actual: "${{ needs.test.outputs.graylog_version }}"
