@@ -198,25 +198,27 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if not args.file_path and not args.version:
-        sys.exit("Either file_path or version must be provided.")
+    # If version is supplied it supersedes others
+    if not args.version:
+        if not args.file_path:
+            sys.exit("Either file_path or version must be provided.")
 
-    if args.file_path and not (args.file_key or args.regex):
-        sys.exit(
-            "Either file_key or regex must be provided when extracting from file.")
+        if args.file_path and not (args.file_key or args.regex):
+            sys.exit(
+                "Either file_key or regex must be provided when extracting from file.")
 
-    if args.file_key and args.regex:
-        sys.exit("Only one of file_key or regex can be provided.")
+        if args.file_key and args.regex:
+            sys.exit("Only one of file_key or regex can be provided.")
 
-    if args.regex:
-        try:
-            re.compile(args.regex)
-        except re.error:
-            sys.exit(f"Invalid regular expression: '{args.regex}'")
-        args.file_format = "text"
+        if args.regex:
+            try:
+                re.compile(args.regex)
+            except re.error:
+                sys.exit(f"Invalid regular expression: '{args.regex}'")
+            args.file_format = "text"
 
-    if args.file_format not in ['yaml', 'json'] and not args.regex:
-        sys.exit("A regex must be provided when using text format.")
+        if args.file_format not in ['yaml', 'json'] and not args.regex:
+            sys.exit("A regex must be provided when using text format.")
 
     result = get_product_cycle(args)
     if not result:

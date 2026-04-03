@@ -47,6 +47,12 @@ jobs:
           product: 'azure-kubernetes-service'
           file_path: '__fixtures__/variables.tf'
           regex: '(?<=default = \")([^\"]+)'
+      - uses: ./
+        name: Python (Version)
+        id: python
+        with:
+          product: python
+          version: 2.7
 
     outputs:
       prometheus_end_of_life: "${{ steps.prometheus.outputs.end_of_life }}"
@@ -55,6 +61,8 @@ jobs:
       grafana_version: "${{ steps.grafana.outputs.version }}"
       graylog_end_of_life: "${{ steps.graylog.outputs.end_of_life }}"
       graylog_version: "${{ steps.graylog.outputs.version }}"
+      python_end_of_life: "${{ steps.python.outputs.end_of_life }}"
+      python_version: "${{ steps.python.outputs.version }}"
 
   assert:
     runs-on: ubuntu-latest
@@ -90,3 +98,13 @@ jobs:
         with:
           expected: 'v5.2.12'
           actual: "${{ needs.test.outputs.graylog_version }}"
+      - name: Assert Python EoL
+        uses: nick-fields/assert-action@v2
+        with:
+          expected: 'true'
+          actual: "${{ needs.test.outputs.python_end_of_life }}"
+      - name: Assert Python extracted version
+        uses: nick-fields/assert-action@v2
+        with:
+          expected: '2.7'
+          actual: "${{ needs.test.outputs.python_version }}"
